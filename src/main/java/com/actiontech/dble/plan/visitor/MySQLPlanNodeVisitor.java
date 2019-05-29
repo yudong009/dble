@@ -112,6 +112,8 @@ public class MySQLPlanNodeVisitor {
             this.tableNode.setDistinct(true);
         }
 
+
+        //####### part1 should deal with the system para
         List<SQLSelectItem> items = sqlSelectQuery.getSelectList();
         if (items != null) {
             List<Item> selectItems = handleSelectItems(items);

@@ -14,6 +14,7 @@ import com.actiontech.dble.plan.common.CastType;
 import com.actiontech.dble.plan.common.exception.MySQLOutPutException;
 import com.actiontech.dble.plan.common.item.*;
 import com.actiontech.dble.plan.common.item.function.ItemCreate;
+import com.actiontech.dble.plan.common.item.function.ItemFuncInner;
 import com.actiontech.dble.plan.common.item.function.ItemFuncKeyWord;
 import com.actiontech.dble.plan.common.item.function.bitfunc.*;
 import com.actiontech.dble.plan.common.item.function.castfunc.ItemCharTypeCast;
@@ -655,6 +656,8 @@ public class MySQLItemVisitor extends MySqlASTVisitorAdapter {
             default:
                 if (ItemCreate.getInstance().isNativeFunc(funcName)) {
                     item = ItemCreate.getInstance().createNativeFunc(funcName, args);
+                } else if (ItemCreate.getInstance().isInnerFunc(funcName)) {
+                    item = ItemCreate.getInstance().createInnerFunc(funcName, args);
                 } else {
                     // unKnownFunction
                     item = new ItemFuncUnknown(funcName, args);

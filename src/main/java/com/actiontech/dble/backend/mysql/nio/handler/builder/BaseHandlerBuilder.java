@@ -23,16 +23,14 @@ import com.actiontech.dble.net.mysql.ErrorPacket;
 import com.actiontech.dble.plan.Order;
 import com.actiontech.dble.plan.common.exception.MySQLOutPutException;
 import com.actiontech.dble.plan.common.item.Item;
+import com.actiontech.dble.plan.common.item.function.ItemFuncInner;
 import com.actiontech.dble.plan.common.item.function.sumfunc.ItemSum;
 import com.actiontech.dble.plan.common.item.subquery.ItemAllAnySubQuery;
 import com.actiontech.dble.plan.common.item.subquery.ItemInSubQuery;
 import com.actiontech.dble.plan.common.item.subquery.ItemSingleRowSubQuery;
 import com.actiontech.dble.plan.common.item.subquery.ItemSubQuery;
-import com.actiontech.dble.plan.node.JoinNode;
-import com.actiontech.dble.plan.node.PlanNode;
+import com.actiontech.dble.plan.node.*;
 import com.actiontech.dble.plan.node.PlanNode.PlanNodeType;
-import com.actiontech.dble.plan.node.QueryNode;
-import com.actiontech.dble.plan.node.TableNode;
 import com.actiontech.dble.plan.util.PlanUtil;
 import com.actiontech.dble.route.RouteResultsetNode;
 import com.actiontech.dble.server.NonBlockingSession;
@@ -160,7 +158,7 @@ public abstract class BaseHandlerBuilder {
     /**
      * no shard-ing node,just send to the first node
      */
-    protected final void noShardBuild() {
+    protected void noShardBuild() {
         this.needCommon = false;
         GlobalVisitor visitor = new GlobalVisitor(node, true);
         visitor.visit();

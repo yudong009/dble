@@ -15,6 +15,8 @@ import com.actiontech.dble.net.mysql.RowDataPacket;
 import com.actiontech.dble.server.ServerConnection;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author mycat
@@ -60,6 +62,20 @@ public final class SelectVersion {
 
     public static byte setCurrentPacket(ServerConnection c) {
         return (byte) c.getSession2().getPacketId().get();
+    }
+
+    public static List<FieldPacket> getField() {
+        List<FieldPacket> result = new ArrayList<>();
+        result.add(PacketUtil.getField("USER()", Fields.FIELD_TYPE_VAR_STRING));
+        return result;
+    }
+
+    public static List<RowDataPacket> getRows(ServerConnection c) {
+        List<RowDataPacket> result = new ArrayList<>();
+        RowDataPacket row = new RowDataPacket(FIELD_COUNT);
+        row.add(Versions.getServerVersion());
+        result.add(row);
+        return result;
     }
 
 }

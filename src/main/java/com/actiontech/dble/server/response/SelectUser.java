@@ -13,6 +13,8 @@ import com.actiontech.dble.server.ServerConnection;
 import com.actiontech.dble.util.StringUtil;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author mycat
@@ -68,4 +70,17 @@ public final class SelectUser {
         return packetId;
     }
 
+    public static List<FieldPacket> getField() {
+        List<FieldPacket> result = new ArrayList<>();
+        result.add(PacketUtil.getField("USER()", Fields.FIELD_TYPE_VAR_STRING));
+        return result;
+    }
+
+    public static List<RowDataPacket> getRows(ServerConnection c) {
+        List<RowDataPacket> result = new ArrayList<>();
+        RowDataPacket row = new RowDataPacket(FIELD_COUNT);
+        row.add(getUser(c));
+        result.add(row);
+        return result;
+    }
 }
