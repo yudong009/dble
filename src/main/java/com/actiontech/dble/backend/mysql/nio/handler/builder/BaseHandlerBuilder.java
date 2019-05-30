@@ -23,7 +23,6 @@ import com.actiontech.dble.net.mysql.ErrorPacket;
 import com.actiontech.dble.plan.Order;
 import com.actiontech.dble.plan.common.exception.MySQLOutPutException;
 import com.actiontech.dble.plan.common.item.Item;
-import com.actiontech.dble.plan.common.item.function.ItemFuncInner;
 import com.actiontech.dble.plan.common.item.function.sumfunc.ItemSum;
 import com.actiontech.dble.plan.common.item.subquery.ItemAllAnySubQuery;
 import com.actiontech.dble.plan.common.item.subquery.ItemInSubQuery;

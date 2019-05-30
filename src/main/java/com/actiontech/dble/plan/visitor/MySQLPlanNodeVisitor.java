@@ -10,6 +10,7 @@ import com.actiontech.dble.meta.ProxyMetaManager;
 import com.actiontech.dble.plan.common.exception.MySQLOutPutException;
 import com.actiontech.dble.plan.common.item.Item;
 import com.actiontech.dble.plan.common.item.ItemField;
+import com.actiontech.dble.plan.common.item.function.ItemCreate;
 import com.actiontech.dble.plan.common.item.function.ItemFunc;
 import com.actiontech.dble.plan.common.item.function.operator.cmpfunc.ItemFuncEqual;
 import com.actiontech.dble.plan.common.item.function.operator.logic.ItemCondAnd;
@@ -25,6 +26,7 @@ import com.alibaba.druid.sql.SQLUtils;
 import com.alibaba.druid.sql.ast.*;
 import com.alibaba.druid.sql.ast.expr.SQLIdentifierExpr;
 import com.alibaba.druid.sql.ast.expr.SQLIntegerExpr;
+import com.alibaba.druid.sql.ast.expr.SQLMethodInvokeExpr;
 import com.alibaba.druid.sql.ast.expr.SQLPropertyExpr;
 import com.alibaba.druid.sql.ast.statement.*;
 import com.alibaba.druid.sql.dialect.mysql.ast.expr.MySqlOrderingExpr;
@@ -100,7 +102,21 @@ public class MySQLPlanNodeVisitor {
     public boolean visit(MySqlSelectQueryBlock sqlSelectQuery) {
         SQLTableSource from = sqlSelectQuery.getFrom();
         if (from != null) {
-            visit(from);
+            String innerFuncSelectSQL = createInnerFuncSelectSQL(sqlSelectQuery.getSelectList());
+            if (innerFuncSelectSQL != null) {
+                MySQLPlanNodeVisitor mtv = new MySQLPlanNodeVisitor(this.currentDb, this.charsetIndex, this.metaManager, this.isSubQuery);
+                mtv.visit(from);
+                NoNameNode innerNode = new NoNameNode(currentDb, innerFuncSelectSQL);
+                List<Item> selectItems = handleSelectItems(selectInnerFuncList(sqlSelectQuery.getSelectList()));
+                if (selectItems != null) {
+                    innerNode.select(selectItems);
+                }
+                JoinNode joinNode = new JoinNode(innerNode, mtv.getTableNode());
+                this.tableNode = joinNode;
+                this.containSchema = mtv.isContainSchema();
+            } else {
+                visit(from);
+            }
             if (this.tableNode instanceof NoNameNode) {
                 this.tableNode.setSql(SQLUtils.toMySqlString(sqlSelectQuery));
             }
@@ -112,8 +128,6 @@ public class MySQLPlanNodeVisitor {
             this.tableNode.setDistinct(true);
         }
 
-
-        //####### part1 should deal with the system para
         List<SQLSelectItem> items = sqlSelectQuery.getSelectList();
         if (items != null) {
             List<Item> selectItems = handleSelectItems(items);
@@ -276,6 +290,7 @@ public class MySQLPlanNodeVisitor {
         this.containSchema = mtv.isContainSchema();
         return true;
     }
+
 
     public void visit(SQLTableSource tables) {
         if (tables instanceof SQLExprTableSource) {
@@ -509,4 +524,33 @@ public class MySQLPlanNodeVisitor {
         }
         return fds;
     }
+
+    private String createInnerFuncSelectSQL(List<SQLSelectItem> items) {
+        StringBuffer sb = new StringBuffer("SELECT ");
+        if (items != null) {
+            for (SQLSelectItem si : items) {
+                if (si.getExpr() instanceof SQLMethodInvokeExpr &&
+                        ItemCreate.getInstance().isInnerFunc(((SQLMethodInvokeExpr) si.getExpr()).getMethodName())) {
+                    sb.append(si.getExpr().toString() + ",");
+                }
+            }
+            if (sb.length() > 7) {
+                sb.setLength(sb.length() - 1);
+                return sb.toString();
+            }
+        }
+        return null;
+    }
+
+    private List<SQLSelectItem> selectInnerFuncList(List<SQLSelectItem> items) {
+        List<SQLSelectItem> result = new ArrayList<>();
+        for (SQLSelectItem si : items) {
+            if (si.getExpr() instanceof SQLMethodInvokeExpr &&
+                    ItemCreate.getInstance().isInnerFunc(((SQLMethodInvokeExpr) si.getExpr()).getMethodName())) {
+                result.add(si);
+            }
+        }
+        return result;
+    }
+
 }

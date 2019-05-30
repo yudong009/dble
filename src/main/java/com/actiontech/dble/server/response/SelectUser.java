@@ -19,9 +19,7 @@ import java.util.List;
 /**
  * @author mycat
  */
-public final class SelectUser {
-    private SelectUser() {
-    }
+public final class SelectUser implements InnerFuncResponse {
 
     private static final int FIELD_COUNT = 1;
     private static final ResultSetHeaderPacket HEADER = PacketUtil.getHeader(FIELD_COUNT);
@@ -70,13 +68,13 @@ public final class SelectUser {
         return packetId;
     }
 
-    public static List<FieldPacket> getField() {
+    public List<FieldPacket> getField() {
         List<FieldPacket> result = new ArrayList<>();
         result.add(PacketUtil.getField("USER()", Fields.FIELD_TYPE_VAR_STRING));
         return result;
     }
 
-    public static List<RowDataPacket> getRows(ServerConnection c) {
+    public List<RowDataPacket> getRows(ServerConnection c) {
         List<RowDataPacket> result = new ArrayList<>();
         RowDataPacket row = new RowDataPacket(FIELD_COUNT);
         row.add(getUser(c));

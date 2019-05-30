@@ -5,8 +5,8 @@ import com.actiontech.dble.net.mysql.RowDataPacket;
 import com.actiontech.dble.plan.common.item.Item;
 import com.actiontech.dble.plan.common.time.MySQLTime;
 import com.actiontech.dble.server.ServerConnection;
+import com.actiontech.dble.server.response.InnerFuncResponse;
 
-import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
@@ -16,35 +16,21 @@ import java.util.List;
  */
 public class ItemFuncInner extends ItemFunc {
 
-    private final String clazzName;
+    private final InnerFuncResponse rspHandler;
     private final String funcName;
 
-    public ItemFuncInner(String funcName, List<Item> args, String clazzName) {
+    public ItemFuncInner(String funcName, List<Item> args, InnerFuncResponse rspHandler) {
         super(args);
         this.funcName = funcName;
-        this.clazzName = clazzName;
+        this.rspHandler = rspHandler;
     }
 
     public List<FieldPacket> getField() {
-        try {
-            Class<?> threadClazz = Class.forName(clazzName);
-            Method method = threadClazz.getMethod("getField");
-            return (List<FieldPacket>) method.invoke(null);
-        } catch (Exception e) {
-
-        }
-        return null;
+        return rspHandler.getField();
     }
 
     public List<RowDataPacket> getRows(ServerConnection connection) {
-        try {
-            Class<?> threadClazz = Class.forName(clazzName);
-            Method method = threadClazz.getMethod("getRows", ServerConnection.class);
-            return (List<RowDataPacket>) method.invoke(null, connection);
-        } catch (Exception e) {
-
-        }
-        return null;
+        return rspHandler.getRows(connection);
     }
 
     @Override
@@ -54,7 +40,7 @@ public class ItemFuncInner extends ItemFunc {
 
     @Override
     public String funcName() {
-        return null;
+        return funcName;
     }
 
     @Override

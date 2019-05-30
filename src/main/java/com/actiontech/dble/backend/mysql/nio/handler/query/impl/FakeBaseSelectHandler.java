@@ -29,12 +29,8 @@ public class FakeBaseSelectHandler extends BaseDMLHandler {
     public void fakeExecute() {
         List<FieldPacket> fields = makeFakeField();
         List<RowDataPacket> data = makeFakeRowData(fields.size());
-        if (data == null) {
-
-        }
-        if (!isInUnion && data.size() > 1) {
+        if (data == null || (!isInUnion && data.size() > 1)) {
             createErrorMessage();
-            nextHandler.errorResponse(null, null);
             return;
         }
         nextHandler.fieldEofResponse(null, null, fields, null, false, null);
@@ -76,7 +72,7 @@ public class FakeBaseSelectHandler extends BaseDMLHandler {
     }
 
     private void createErrorMessage() {
-
+        session.onQueryError("Subquery returns more than 1 row".getBytes());
     }
 
     @Override
