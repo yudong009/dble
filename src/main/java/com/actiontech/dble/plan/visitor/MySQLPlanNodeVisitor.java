@@ -107,6 +107,7 @@ public class MySQLPlanNodeVisitor {
                 MySQLPlanNodeVisitor mtv = new MySQLPlanNodeVisitor(this.currentDb, this.charsetIndex, this.metaManager, this.isSubQuery);
                 mtv.visit(from);
                 NoNameNode innerNode = new NoNameNode(currentDb, innerFuncSelectSQL);
+                innerNode.setFakeNode(true);
                 List<Item> selectItems = handleSelectItems(selectInnerFuncList(sqlSelectQuery.getSelectList()));
                 if (selectItems != null) {
                     innerNode.select(selectItems);
@@ -122,6 +123,10 @@ public class MySQLPlanNodeVisitor {
             }
         } else {
             this.tableNode = new NoNameNode(currentDb, SQLUtils.toMySqlString(sqlSelectQuery));
+            String innerFuncSelectSQL = createInnerFuncSelectSQL(sqlSelectQuery.getSelectList());
+            if (innerFuncSelectSQL != null) {
+                ((NoNameNode) tableNode).setFakeNode(true);
+            }
         }
 
         if (tableNode != null && (sqlSelectQuery.getDistionOption() == SQLSetQuantifier.DISTINCT || sqlSelectQuery.getDistionOption() == SQLSetQuantifier.DISTINCTROW)) {
