@@ -75,13 +75,13 @@ public final class ComplexQueryPlanUtil {
         for (int i = 0; i < mergeNodeSize; i++) {
             DMLResponseHandler startHandler = endHandler.getMerges().get(i);
             MultiNodeMergeHandler mergeHandler = (MultiNodeMergeHandler) startHandler;
-            String mergeName = getTypeName(mergeHandler);
+            String mergeName = getMergeType(mergeHandler);
             List<BaseSelectHandler> mergeList = new ArrayList<>();
             mergeList.addAll(((MultiNodeMergeHandler) startHandler).getExeHandlers());
             String mergeNode = genHandlerName(mergeName, nameMap);
             ReferenceHandlerInfo refInfo = new ReferenceHandlerInfo(mergeNode, mergeName, mergeHandler);
-            if(mergeHandler instanceof MultiNodeFakeHandler){
-                refInfo.setBaseSQL(((MultiNodeFakeHandler)mergeHandler).toSQLString());
+            if (mergeHandler instanceof MultiNodeFakeHandler) {
+                refInfo.setBaseSQL(((MultiNodeFakeHandler) mergeHandler).toSQLString());
             }
             handlerMap.put(mergeHandler, refInfo);
             refMap.put(mergeNode, refInfo);
@@ -171,14 +171,18 @@ public final class ComplexQueryPlanUtil {
     }
 
 
-    private static String getTypeName(DMLResponseHandler handler) {
+    private static String getMergeType(DMLResponseHandler handler) {
         if (handler instanceof MultiNodeFakeHandler) {
             return "INNER_FUNC_MERGE";
         } else if (handler instanceof MultiNodeEasyMergeHandler) {
             return "MERGE";
-        } else if (handler instanceof MultiNodeMergeAndOrderHandler) {
+        } else {
             return "MERGE_AND_ORDER";
-        } else if (handler instanceof AggregateHandler) {
+        }
+    }
+
+    private static String getTypeName(DMLResponseHandler handler) {
+        if (handler instanceof AggregateHandler) {
             return "AGGREGATE";
         } else if (handler instanceof DistinctHandler) {
             return "DISTINCT";
