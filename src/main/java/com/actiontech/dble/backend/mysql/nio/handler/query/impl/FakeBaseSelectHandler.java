@@ -40,6 +40,13 @@ public class FakeBaseSelectHandler extends BaseDMLHandler {
         nextHandler.rowEofResponse(null, false, null);
     }
 
+    public String toSQLString() {
+        StringBuffer sb = new StringBuffer("");
+        for (Item i : selectList) {
+            sb.append(i.getItemName() + ";");
+        }
+        return sb.toString();
+    }
 
     private List<FieldPacket> makeFakeField() {
         List<FieldPacket> totalResult = new ArrayList<>();

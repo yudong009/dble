@@ -386,12 +386,23 @@ public class MySQLPlanNodeVisitor {
         MySQLItemVisitor mev = new MySQLItemVisitor(this.currentDb, this.charsetIndex, this.metaManager);
         whereExpr.accept(mev);
         if (this.tableNode != null) {
-            Item whereFilter = mev.getItem();
-            tableNode.query(whereFilter);
-            if (whereFilter.isWithSubQuery()) {
-                tableNode.setWithSubQuery(true);
-                tableNode.setContainsSubQuery(true);
-                tableNode.setCorrelatedSubQuery(whereFilter.isCorrelatedSubQuery());
+            if (tableNode instanceof JoinInnerNode) {
+                Item whereFilter = mev.getItem();
+                PlanNode tn = ((JoinInnerNode) tableNode).getRightNode();
+                tn.query(whereFilter);
+                if (whereFilter.isWithSubQuery()) {
+                    tn.setWithSubQuery(true);
+                    tn.setContainsSubQuery(true);
+                    tn.setCorrelatedSubQuery(whereFilter.isCorrelatedSubQuery());
+                }
+            } else {
+                Item whereFilter = mev.getItem();
+                tableNode.query(whereFilter);
+                if (whereFilter.isWithSubQuery()) {
+                    tableNode.setWithSubQuery(true);
+                    tableNode.setContainsSubQuery(true);
+                    tableNode.setCorrelatedSubQuery(whereFilter.isCorrelatedSubQuery());
+                }
             }
         } else {
             throw new MySQLOutPutException(ErrorCode.ER_OPTIMIZER, "", "from expression is null,check the sql!");

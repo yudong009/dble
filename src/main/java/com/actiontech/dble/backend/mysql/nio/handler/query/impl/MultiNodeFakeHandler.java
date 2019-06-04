@@ -67,4 +67,9 @@ public class MultiNodeFakeHandler extends MultiNodeMergeHandler {
     protected void recycleResources() {
 
     }
+
+    public String toSQLString() {
+        return execHandler.toSQLString();
+    }
+
 }
