@@ -257,6 +257,7 @@ public class ItemCreate {
         nativFuncs.put("YEARWEEK", new ItemFuncYearweek(null));
         nativFuncs.put("YEAR", new ItemFuncYear(null));
 
+        innerFuncs.put("CURRENT_USER", new SelectCurrentUser());
         innerFuncs.put("USER", new SelectUser());
         innerFuncs.put("VERSION", new SelectVersion());
         innerFuncs.put("DATABASE", new SelectDatabase());
