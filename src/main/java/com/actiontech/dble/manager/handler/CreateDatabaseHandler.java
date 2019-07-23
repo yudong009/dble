@@ -59,7 +59,7 @@ public final class CreateDatabaseHandler {
         //check dataNodes
         for (String singleDn : dataNodes) {
             if (DbleServer.getInstance().getConfig().getDataNodes().get(singleDn) == null) {
-                c.writeErrMessage(ErrorCode.ER_UNKNOWN_ERROR, "DataNode " + singleDn + " does not exists");
+                c.writeErrMessage(ErrorCode.ER_UNKNOWN_ERROR, "DataNode " + singleDn + " does not exist");
                 return;
             }
         }
